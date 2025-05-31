@@ -1,0 +1,22 @@
+artefacts
+exe
+*.dSYM/
+
+zig-out/
+.zig-cache/
+
+*.o
+*.a
+aux/log_checker/log_checker
+
+.DS_Store
+*_local
+.cache
+
+*.out
+
+
+*.asm
+
+# i said shhhhh
+**/illegal_roms/**/**
