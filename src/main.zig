@@ -13,9 +13,23 @@ const Smp = struct {
 
     ram: [ramSize]u8,
 
+    const LoadError = error{
+        CouldntOpenFile,
+        NotAnSpcFile,
+    };
+
     pub fn load(path: []const u8) !Smp {
-        const file = try std.fs.cwd().openFile(path, .{});
+        const file = std.fs.cwd().openFile(path, .{}) catch {
+            return LoadError.CouldntOpenFile;
+        };
         defer file.close();
+        const reader = file.reader();
+
+        var header: [0x24]u8 = undefined;
+        _ = try reader.read(&header);
+        if (!std.mem.eql(u8, header[0..0x21], "SNES-SPC700 Sound File Data v0.30") or header[0x21] != 0x1a or header[0x22] != 0x1a) {
+            return LoadError.NotAnSpcFile;
+        }
 
         return Smp{ .ram = undefined };
     }
