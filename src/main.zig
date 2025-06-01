@@ -25,9 +25,23 @@ const Smp = struct {
         defer file.close();
         const reader = file.reader();
 
-        var header: [0x24]u8 = undefined;
+        var header: [0x23]u8 = undefined;
         _ = try reader.read(&header);
         if (!std.mem.eql(u8, header[0..0x23], "SNES-SPC700 Sound File Data v0.30" ++ .{ 0x1a, 0x1a })) {
+            return LoadError.NotAnSpcFile;
+        }
+
+        const byte23 = try reader.readByte();
+        if (byte23 == 26) {
+            std.log.info("-- ID666 info inbound", .{});
+        } else if (byte23 == 27) {
+            std.log.info("-- No ID666 info inbound", .{});
+        } else {
+            return LoadError.NotAnSpcFile;
+        }
+
+        const byte25 = try reader.readByte();
+        if (byte25 != 30) {
             return LoadError.NotAnSpcFile;
         }
 
