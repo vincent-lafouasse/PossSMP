@@ -45,6 +45,28 @@ const Smp = struct {
             return LoadError.NotAnSpcFile;
         }
 
+        const pcl: u16 = try reader.readByte();
+        const pch: u16 = try reader.readByte();
+        const pc = pcl + 256 * pch;
+        const a = try reader.readByte();
+        const x = try reader.readByte();
+        const y = try reader.readByte();
+        const status = try reader.readByte();
+        const sp: u16 = try reader.readByte();
+
+        std.log.info("Registers:", .{});
+        std.log.info("pc = {x:04}", .{pc});
+        std.log.info("a = {x:02}", .{a});
+        std.log.info("x = {x:02}", .{x});
+        std.log.info("y = {x:02}", .{y});
+        std.log.info("p = {b:08}", .{status});
+        std.log.info("sp = {x:02}", .{sp});
+
+        {
+            var unused: [2]u8 = undefined;
+            _ = try reader.read(&unused);
+        }
+
         return Smp{ .ram = undefined };
     }
 };
