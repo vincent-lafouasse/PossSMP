@@ -36,7 +36,7 @@ const Smp = struct {
     xRegister: u8 = 0,
     yRegister: u8 = 0,
     status: u8 = 0,
-    stackPointer: u8 = 0,
+    stackPointer: u16 = 0,
     programCounter: u16 = 0,
     yaRegister: u16 = 0,
 
@@ -109,7 +109,19 @@ const Smp = struct {
         std.log.info("dumped by: {s} ({s}, {x:02})", .{ dumperName, dumpDate, emulatorDump });
         std.log.info("comments: {s}", .{comment});
 
-        return Smp{ .ram = undefined };
+        var ram: [Smp.ramSize]u8 = undefined;
+        _ = try reader.read(&ram);
+
+        return Smp{
+            .accumulator = a,
+            .xRegister = x,
+            .yRegister = y,
+            .status = status,
+            .stackPointer = sp,
+            .programCounter = pc,
+            .yaRegister = 0,
+            .ram = ram,
+        };
     }
 };
 
@@ -117,5 +129,5 @@ pub fn main() !void {
     const veryCool = "spc/ChronoTrigger/304 Corridors of Time.spc";
     const smp = try Smp.load(veryCool);
 
-    _ = smp;
+    std.log.info("{any}", .{smp});
 }
