@@ -75,9 +75,14 @@ const Smp = struct {
         const comment = header[0x7e..0x9e];
         const dumpDate = header[0x9e..0xa9];
 
+        const secsBeforeFadeOut = readNumber(u32, header[0xa9..0xac]);
+        const msFadeOut = readNumber(u64, header[0xac..0xb1]);
+
         std.log.info("song name: {s}", .{songTitle});
         std.log.info("game title: {s}", .{gameTitle});
         std.log.info("", .{});
+        std.log.info("secs before fadeout: {}", .{secsBeforeFadeOut});
+        std.log.info("ms of fadein: {}", .{msFadeOut});
         std.log.info("", .{});
         std.log.info("dumped by: {s} ({s})", .{ dumperName, dumpDate });
         std.log.info("comments: {s}", .{comment});
