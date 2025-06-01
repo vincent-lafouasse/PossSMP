@@ -95,13 +95,18 @@ const Smp = struct {
         const secsBeforeFadeOut: u16 = atou(u16, header[0xa9..0xac]).?;
         const msFadeOut: u16 = atou(u16, header[0xac..0xb1]).?;
 
+        const artistName = header[0xb1..0xd1];
+
+        const emulatorDump = header[0xd2];
+
         std.log.info("song name: {s}", .{songTitle});
+        std.log.info("artist name: {s}", .{artistName});
         std.log.info("game title: {s}", .{gameTitle});
         std.log.info("", .{});
         std.log.info("secs before fadeout: {}", .{secsBeforeFadeOut});
         std.log.info("ms of fadein: {}", .{msFadeOut});
         std.log.info("", .{});
-        std.log.info("dumped by: {s} ({s})", .{ dumperName, dumpDate });
+        std.log.info("dumped by: {s} ({s}, {x:02})", .{ dumperName, dumpDate, emulatorDump });
         std.log.info("comments: {s}", .{comment});
 
         return Smp{ .ram = undefined };
