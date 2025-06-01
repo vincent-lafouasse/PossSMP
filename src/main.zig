@@ -1,5 +1,17 @@
 const std = @import("std");
 
+fn readNumber(comptime T: type, data: []const u8) T {
+    var out: T = 0;
+    var multiplicator: T = 1;
+
+    for (data) |byte| {
+        out += @as(T, byte) * multiplicator;
+        multiplicator <<= 8;
+    }
+
+    return out;
+}
+
 const Smp = struct {
     const ramSize = 0x10000;
 
@@ -41,9 +53,7 @@ const Smp = struct {
             return LoadError.NotAnSpcFile;
         }
 
-        const pcl: u16 = header[0x25];
-        const pch: u16 = header[0x26];
-        const pc = pcl + 256 * pch;
+        const pc = readNumber(u16, header[0x25..0x27]);
         const a = header[0x27];
         const x = header[0x28];
         const y = header[0x29];
@@ -57,6 +67,20 @@ const Smp = struct {
         std.log.info("y = {x:02}", .{y});
         std.log.info("p = {b:08}", .{status});
         std.log.info("sp = {x:02}", .{sp});
+        std.log.info("", .{});
+
+        const songTitle = header[0x2e..0x4e];
+        const gameTitle = header[0x4e..0x6e];
+        const dumperName = header[0x6e..0x7e];
+        const comment = header[0x7e..0x9e];
+        const dumpDate = header[0x9e..0xa9];
+
+        std.log.info("song name: {s}", .{songTitle});
+        std.log.info("game title: {s}", .{gameTitle});
+        std.log.info("", .{});
+        std.log.info("", .{});
+        std.log.info("dumped by: {s} ({s})", .{ dumperName, dumpDate });
+        std.log.info("comments: {s}", .{comment});
 
         return Smp{ .ram = undefined };
     }
