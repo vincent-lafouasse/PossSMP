@@ -1,12 +1,29 @@
 const std = @import("std");
 
-fn readNumber(comptime T: type, data: []const u8) T {
+fn readLittleEndian(comptime T: type, data: []const u8) T {
     var out: T = 0;
     var multiplicator: T = 1;
 
     for (data) |byte| {
         out += @as(T, byte) * multiplicator;
         multiplicator <<= 8;
+    }
+
+    return out;
+}
+
+fn atou(comptime T: type, data: []const u8) ?T {
+    var out: T = 0;
+
+    for (data) |c| {
+        if (c == 0) {
+            break;
+        }
+        if (c < '0' or c > '9') {
+            return null;
+        }
+        out *= @as(T, 10);
+        out += @as(T, c - '0');
     }
 
     return out;
@@ -53,7 +70,7 @@ const Smp = struct {
             return LoadError.NotAnSpcFile;
         }
 
-        const pc = readNumber(u16, header[0x25..0x27]);
+        const pc = readLittleEndian(u16, header[0x25..0x27]);
         const a = header[0x27];
         const x = header[0x28];
         const y = header[0x29];
@@ -75,8 +92,8 @@ const Smp = struct {
         const comment = header[0x7e..0x9e];
         const dumpDate = header[0x9e..0xa9];
 
-        const secsBeforeFadeOut = readNumber(u32, header[0xa9..0xac]);
-        const msFadeOut = readNumber(u64, header[0xac..0xb1]);
+        const secsBeforeFadeOut: u16 = atou(u16, header[0xa9..0xac]).?;
+        const msFadeOut: u16 = atou(u16, header[0xac..0xb1]).?;
 
         std.log.info("song name: {s}", .{songTitle});
         std.log.info("game title: {s}", .{gameTitle});
