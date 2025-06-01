@@ -27,7 +27,7 @@ const Smp = struct {
 
         var header: [0x24]u8 = undefined;
         _ = try reader.read(&header);
-        if (!std.mem.eql(u8, header[0..0x21], "SNES-SPC700 Sound File Data v0.30") or header[0x21] != 0x1a or header[0x22] != 0x1a) {
+        if (!std.mem.eql(u8, header[0..0x23], "SNES-SPC700 Sound File Data v0.30" ++ .{ 0x1a, 0x1a })) {
             return LoadError.NotAnSpcFile;
         }
 
